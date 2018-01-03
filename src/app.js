@@ -119,10 +119,3 @@ var HelloWorldScene = cc.Scene.extend({
         this.addChild(layer);
     }
 });
-
-
-//y - y1 = (y2 - y1)*(x - x1)/(x2 - x1)
-
-
-// y = (x/ 3) + 320; (960,640)
-// y = -(x/ 3) + 320; (960,640)
