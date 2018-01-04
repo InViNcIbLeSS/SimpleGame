@@ -18,31 +18,15 @@ var MainLayer = cc.Layer.extend({
         var size = cc.winSize;
         cc.director.setClearColor(cc.color(255,255,255,255));
 
-
-
-
-        // var button = new ccui.Button();
-        // button.loadTextures(res.HelloWorld_png);
-        // button.x = size.width / 2;
-        // button.y = size.height / 2;
-        // button.addTouchEventListener(this.touchEvent, this);
-        // this.addChild(button);
-
-        //var menuItem1 = new cc.MenuItemFont("Play", play);
-        //var menuItem2 = new cc.MenuItemFont("Exit", exit);
-        // scores = new cc.LabelTTF("Score is: 0", "Arial");
-        // scores.setFontSize(20);
-        // this.addChild(scores);
         player = new cc.Sprite.create(res.Player_png);
         player.setPosition(cc.p(player.getContentSize().width / 2, size.height / 2));
         obj = this;
-        cc.audioEngine.playMusic(res.background_mus, true);
+       // cc.audioEngine.playMusic(res.background_mus, true);
         cc.audioEngine.setMusicVolume(0.05);
+        passed = 0;
+        score = 0;
         this.addChild(player);
-        // scores = new cc.LabelTTF("Score is: 0", "Arial");
-        // scores.setFontSize(20);
-        // this.addChild(scores);
-         this.scheduleOnce(this.addScores);
+        this.scheduleOnce(this.addScores);
         this.schedule(this.addMonster, 3);
 
         if(cc.sys.capabilities.hasOwnProperty('mouse'))
@@ -63,22 +47,6 @@ var MainLayer = cc.Layer.extend({
         }
         this.scheduleUpdate();
     },
-    // touchEvent:function(type){
-    //     switch(type){
-
-
-    //         case ccui.Widget.TOUCH_BEGAN:
-    //             cc.log("touch Began");
-    //             break;
-
-
-
-    //         case ccui.Widget.TOUCH_ENDED:
-    //             cc.log("touch Done");
-    //             break;
-    //     }
-
-    // },
     addScores:function(){
         var size = cc.winSize;
 
@@ -163,17 +131,15 @@ var MainLayer = cc.Layer.extend({
         var timeRange = maxTime - minTime;
         var actualTime = (Math.random() * timeRange) + minTime;
         var action = cc.Sequence.create(
-            cc.MoveTo.create(actualTime, cc.p(-size.width / 2, actualY)),
+            cc.MoveTo.create(actualTime, cc.p(-20, actualY)),
             cc.CallFunc.create(function(monster){
                      obj.remove(this.monsters, monster);
                      monster.removeFromParent();
                      passed++;
                      cc.log("Monster passed:" + passed);
                      pass.setString(" Monsters passed: "+ passed);
-                     if(passed > 5){
-                        // var scene =  new GameOver.scene(true);
-                        // cc.Director.getInstance().replaceScene(scene);
-
+                     if(passed > 2){
+                        exit();
                      }
                         
 
@@ -183,11 +149,13 @@ var MainLayer = cc.Layer.extend({
         monster.runAction(action);
         this.monsters.push(monster);
     },
-    exit:function(){
-        cc.director.Pause
-    },
+    
 });
-
+var exit = function(){
+        //cc.director.popScene();
+        var scene  = new GameOverScene();
+        cc.director.runScene(scene);
+}
 var locationTap = function(location,projectile){
         var size = cc.winSize;
         var offset = cc.pSub(location, projectile.getPosition());
@@ -243,7 +211,7 @@ var ResumeMusic = function()
 {
     cc.audioEngine.resumeMusic();
 };
-var HelloWorldScene = cc.Scene.extend({
+var MainLayerScene = cc.Scene.extend({
     onEnter:function () {
         this._super();
         var layer = new MainLayer();       
