@@ -30,19 +30,14 @@ var MainLayer = cc.Layer.extend({
 
         //var menuItem1 = new cc.MenuItemFont("Play", play);
         //var menuItem2 = new cc.MenuItemFont("Exit", exit);
-        // scores = new cc.LabelTTF("Score is: 0", "Arial");
-        // scores.setFontSize(20);
-        // this.addChild(scores);
+
         player = new cc.Sprite.create(res.Player_png);
         player.setPosition(cc.p(player.getContentSize().width / 2, size.height / 2));
         obj = this;
         cc.audioEngine.playMusic(res.background_mus, true);
         cc.audioEngine.setMusicVolume(0.05);
         this.addChild(player);
-        // scores = new cc.LabelTTF("Score is: 0", "Arial");
-        // scores.setFontSize(20);
-        // this.addChild(scores);
-         this.scheduleOnce(this.addScores);
+        this.scheduleOnce(this.addScores);
         this.schedule(this.addMonster, 3);
 
         if(cc.sys.capabilities.hasOwnProperty('mouse'))
@@ -171,9 +166,9 @@ var MainLayer = cc.Layer.extend({
                      cc.log("Monster passed:" + passed);
                      pass.setString(" Monsters passed: "+ passed);
                      if(passed > 5){
-                        // var scene =  new GameOver.scene(true);
-                        // cc.Director.getInstance().replaceScene(scene);
-
+                        var scene =  new GameOver.scene(true);
+                        cc.Director.getInstance().replaceScene(scene);
+                        
                      }
                         
 
