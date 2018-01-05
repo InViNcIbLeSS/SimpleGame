@@ -4,11 +4,15 @@ var projectile;
 var player;
 var passed = 0;
 var score = 0;
+var i = 0;
 
 var MainLayer = cc.Layer.extend({
 
-    sprite:null,
+    i: null,
+    players: [],
+    lives: [],
     monsters: [],
+    animationfrmes: [],
     projectiles: [],
     scores: null,
     pass: null,
@@ -16,16 +20,48 @@ var MainLayer = cc.Layer.extend({
         this._super();
 
         var size = cc.winSize;
-        cc.director.setClearColor(cc.color(255,255,255,255));
+        cc.director.setClearColor(cc.color(188,191,210,255));
 
-        player = new cc.Sprite.create(res.Player_png);
-        player.setPosition(cc.p(player.getContentSize().width / 2, size.height / 2));
+        
         obj = this;
        // cc.audioEngine.playMusic(res.background_mus, true);
         cc.audioEngine.setMusicVolume(0.05);
         passed = 0;
         score = 0;
+
+        player = new cc.Sprite.create(res.player_arr_1);
+        player.setPosition(cc.p(player.getContentSize().width / 2, size.height / 2));
+       // spritesheet.addChild(player, 25);
+        //player.runAction(player_anim);
+        //this.addChild(player);
+
+
+        cc.spriteFrameCache.addSpriteFrames(res.player_list);
+        var players = [];
+        spritesheet =  cc.textureCache.addImage(res.player_arr);
+        //debugger
+
+       // cc.spriteFrameCache.addSpriteFrames(spritesheet, res.player_list);
+       // obj.addChild(spritesheet, 16);
+        for(var i = 1; i < 18 ; i++){
+            str = i + ".png";
+            var frame = cc.spriteFrameCache.getSpriteFrame(str);
+            players.push(frame);
+        }
+        players.shift();
+        cc.log(players.length);
+
+        animation = new cc.Animation(players, 0.1);
+        player_anim = new cc.repeatForever(new cc.Animate(animation), 1);
+        // player = new cc.Sprite(res.player_arr_1);
+        // player.setPosition(cc.p(player.getContentSize().width / 2, size.height / 2));
+        
         this.addChild(player);
+        player.runAction(player_anim);
+        
+        
+
+       // this.scheduleOnce(this.addPlayer);        
         this.scheduleOnce(this.addScores);
         this.schedule(this.addMonster, 3);
 
@@ -47,9 +83,22 @@ var MainLayer = cc.Layer.extend({
         }
         this.scheduleUpdate();
     },
+
+    addPlayer:function(){
+
+        //1800*900
+        var size = cc.winSize;
+        
+    },
     addScores:function(){
         var size = cc.winSize;
 
+
+        for(var i = 1; i < 6; i++){
+            this.lives[i] = new cc.Sprite.create(res.Life_png);
+            this.lives[i].setPosition(cc.p((size.width / 2) + i*20 , size.height - this.lives[i].getContentSize().height / 2));
+            this.addChild(this.lives[i]);
+        } 
         scores = new cc.LabelTTF("Score is: 0", "Arial");
         scores.setFontSize(20);
         score.setverticalAlign
@@ -63,10 +112,17 @@ var MainLayer = cc.Layer.extend({
         pass.setColor(cc.color(255,0,0));
 
         this.addChild(scores);
-        this.addChild(pass);
+        //this.addChild(pass);
 
     },
     update:function(dt){
+
+        // if(i < 15){
+        // this.player.setTexture(res.player_arr(players[i++])) ;
+        // }
+        // else
+        //     i = 0;
+
 
         for(var i = 0; i < this.projectiles.length; i++){
 
@@ -79,14 +135,17 @@ var MainLayer = cc.Layer.extend({
                 var projectileRect = projectile.getBoundingBox();
                 var playerRect = player.getBoundingBox();
 
-                // if(cc.rectIntersectsRect(monsterRect, playerRect)){
+                // if(cc.rectIntersectsRect(monsterRect, playerRect) || cc.rectIntersectsRect(monsterRect,projectileRect) ){
 
+                //     cc.log(playerRect);
+
+                //     if(!cc.rectIntersectsRect(monsterRect, playerRect) == null)
                 //     cc.log("Player Died");
                 //     obj.remove(this.monsters, monster);
                 //     monster.removeFromParent();
                 // }
-                if(cc.rectIntersectsRect(monsterRect,projectileRect)){
-
+                 if(cc.rectIntersectsRect(monsterRect,projectileRect)){
+                //    else {
                     cc.audioEngine.playEffect(res.explosion_mus, false);
                     obj.remove(this.monsters, monster);
                     monster.removeFromParent();
@@ -96,9 +155,7 @@ var MainLayer = cc.Layer.extend({
                     cc.log("Score is:" + score);
                     scores.setString("Score is: " + score);
 
-                }
-                
-
+                }              
             }
         }        
     },
@@ -116,11 +173,12 @@ var MainLayer = cc.Layer.extend({
         monster = new cc.Sprite.create(res.Monster_png);
         var size = cc.winSize;    
 
-        var minY = size.height / 2;
-        var maxY = size.height - size.height / 2;
+        // var minY = size.height / 2;
+        // var maxY = size.height - size.height / 2;
 
-        var range = maxY - minY;
-        var actualY = (Math.random() *size.height) ;
+        // var range = maxY - minY;
+
+        var actualY = (Math.random() *(size.height - monster.getContentSize().height)) ;
 
         monster.setPosition(size.width + monster.getContentSize().width / 2 , actualY);
        // cc.log("here");
@@ -133,15 +191,18 @@ var MainLayer = cc.Layer.extend({
         var action = cc.Sequence.create(
             cc.MoveTo.create(actualTime, cc.p(-20, actualY)),
             cc.CallFunc.create(function(monster){
-                     obj.remove(this.monsters, monster);
-                     monster.removeFromParent();
-                     passed++;
-                     cc.log("Monster passed:" + passed);
-                     pass.setString(" Monsters passed: "+ passed);
-                     if(passed > 2){
-                        exit();
-                     }
-                        
+                 obj.remove(this.monsters, monster);
+                 monster.removeFromParent();
+                 passed++;
+                 cc.log("Monster passed:" + passed);
+                 pass.setString(" Monsters passed: "+ passed);
+                 if(passed < 5){
+                 obj.remove(this.lives);
+                 this.lives[passed].removeFromParent();
+                 }
+                 else {
+                    exit();
+                 }
 
             }, this)
         )

@@ -6,7 +6,7 @@ var GameOver = cc.Layer.extend({
 	ctor:function(){
 		this._super();
 		var size = cc.winSize;	
-		cc.director	.setClearColor(cc.color(255,0,0,0,0));
+		cc.director	.setClearColor(cc.color(0,204,0,0,0));
 			var menuItem1 = new cc.MenuItemFont("Play Again", play);
 	        var menuItem2 = new cc.MenuItemFont("Exit", exit);
 
